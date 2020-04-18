@@ -9,4 +9,4 @@ $ curl -i localhost:49160
 ## test apache2
 http://localhost:8080/
 ## test postgres 
-psql --host=localhost --port=5432 --username=postgres
+$ psql --host=localhost --port=5432 --username=postgres
