@@ -1,0 +1,20 @@
+version: "3"
+
+services: 
+    db_postgresql:
+        build: ./db_postgresql
+        environment:
+            POSTGRES_PASSWORD: example
+        ports: 
+            - '5432:5432'
+
+    runtime_environment_nodejs:
+        build: ./runtime_environment_nodejs
+        ports:
+            - '49160:8080'
+
+    web_server_httpd:
+        build: ./web_server_httpd
+        ports:
+            - '8080:80'
+        tty: true
