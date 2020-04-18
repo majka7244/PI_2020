@@ -13,6 +13,6 @@ http://localhost:8080/
 $ psql --host=localhost --port=5432 --username=postgres
 
 ## Architektura
-*web_server_httpd - httpd zapewnia certyfikaty ssl oraz proxy dla aplikacji 
-*runtime_environment_nodejs - silnik nodejs generuje stronę aplikacji oraz zapewnia komunikacje z bazą postgresql
-*db_postgresql - baza danych 
+..*web_server_httpd - httpd zapewnia certyfikaty ssl oraz proxy dla aplikacji 
+..*runtime_environment_nodejs - silnik nodejs generuje stronę aplikacji oraz zapewnia komunikacje z bazą postgresql
+..*db_postgresql - baza danych 
