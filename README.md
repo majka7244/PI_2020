@@ -1,9 +1,9 @@
 # PI_2020
 Projekt Inżynierski 
 ## Uruchomienie aplikacji w kontenerach 
-git clone https://github.com/majka7244/PI_2020.git
-cd PI_2020
-docker-compose run 
+$ git clone https://github.com/majka7244/PI_2020.git
+$ cd PI_2020
+$ docker-compose run 
 ## Test komponentów 
 ### nodejs 
 $ curl -i localhost:49160
