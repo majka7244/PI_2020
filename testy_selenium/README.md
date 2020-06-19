@@ -1,0 +1,1 @@
+Testy przygotowane w Selenium https://www.selenium.dev/selenium-ide/
