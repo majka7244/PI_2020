@@ -1,9 +1,9 @@
-var express=require("express"); 
-var bodyParser=require("body-parser"); 
-const crypto = require('crypto');
+var express=require("express");           // Wymagane biblioteki 
+var bodyParser=require("body-parser");    // Wymagane biblioteki 
+const crypto = require('crypto');         // Wymagane biblioteki 
   
-const mongoose = require('mongoose'); 
-mongoose.connect('mongodb+srv://dbUser:dbUserPassword@cluster0-gzzce.mongodb.net/test?retryWrites=true&w=majority'); 
+const mongoose = require('mongoose');     // Wymagane biblioteki 
+mongoose.connect('mongodb+srv://dbUser:dbUserPassword@cluster0-gzzce.mongodb.net/test?retryWrites=true&w=majority');    // Połączenie do bazy mongodb. 
 var db=mongoose.connection; 
 db.on('error', console.log.bind(console, "connection error")); 
 db.once('open', function(callback){ 
@@ -19,80 +19,48 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ 
     extended: true
 })); 
-app.post('/sign_up', function(req,res){ 
-    var secrete_id = req.body.secrete_id; 
-    var user_password = req.body.user_password; 
-
-
-    db.collection("details").find({}).toArray(function(err, result) {
+app.post('/sign_up', function(req,res){            // Przekierowanie rządania w momencie naciśnięcia przycisku "Submit".
+    db.collection("details").find({}).toArray(function(err, result) {     // Przeszukanie bazy "details" w celu uzyskania wszystkich udzielonych odpowiedzi. 
         if (err) throw err;
-        // console.log(result.length);
-        // console.log(result[0]["osname"]);
-        // console.log(result[0]["osname_mobile"]);
-        // console.log(result[0]["browsername"]);
-        var result_length = result.length; 
-        var no_windows=0
-        var no_linux=0
-        var no_others_pc=0
-        var no_android=0
-        var no_ios=0
-        var no_others_mobile=0
-        var no_chrome=0
-        var no_firefox=0
-        var no_opera=0
-        var no_others_browsers=0
-        for (i = 0; i < result.length; i++) {
-            // console.log(result[i]["osname"]);
+        var result_length = result.length;            // Zmienna przyjmująca wartość ilości udzielonych ankiet. 
+        var no_windows=0                              // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na system operacyjny klasy PC "windows" .
+        var no_linux=0                                // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na system operacyjny klasy PC "linux".
+        var no_others_pc=0                            // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na system operacyjny klasy PC inne niż windows/linux.
+        var no_android=0                              // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na system operacyjny klasy Mobile "android".
+        var no_ios=0                                  // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na system operacyjny klasy Mobile "ios".
+        var no_others_mobile=0                        // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na system operacyjny klasy Mobile inne niż android/ios.
+        var no_chrome=0                               // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na wybraną przeglądarkę "chrome".
+        var no_firefox=0                              // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na wybraną przeglądarkę "firefox".
+        var no_opera=0                                // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na wybraną przeglądarkę "opera".
+        var no_others_browsers=0                      // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na wybraną przeglądarkę chrome/firefox/opera.
+        for (i = 0; i < result.length; i++) {         //Podliczenie wyników systemu operacyjnego klasy PC z bazy.
             if(result[i]["osname"].toLowerCase().includes("windows")){no_windows++}
             else if(result[i]["osname"].toLowerCase().includes("linux")){no_linux++}
             else{no_others_pc++}
           }
-        for (i = 0; i < result.length; i++) {
-            // console.log(result[i]["osname_mobile"]);
+        for (i = 0; i < result.length; i++) {         //Podliczenie wyników systemu operacyjnego klasy Mobile z bazy.
             if(result[i]["osname_mobile"].toLowerCase().includes("android")){no_android++}
             else if(result[i]["osname_mobile"].toLowerCase().includes("ios")){no_ios++}
             else{no_others_mobile++}
           }
-        for (i = 0; i < result.length; i++) {
-            // console.log(result[i]["browsername"]);
+        for (i = 0; i < result.length; i++) {         //Podliczenie wyników wybranej przeglądarki z bazy.
             if(result[i]["browsername"].toLowerCase().includes("chrome")){no_chrome++}
             else if(result[i]["browsername"].toLowerCase().includes("firefox")){no_firefox++}
             else if(result[i]["browsername"].toLowerCase().includes("opera")){no_opera++}
             else{no_others_browsers++}
           }
-        var procent_windows = +((no_windows / result_length * 100).toFixed(2));
-        var procent_linux = +((no_linux / result_length * 100).toFixed(2));
-        var procent_pc_others = +((no_others_pc / result_length * 100).toFixed(2));
-        var procent_android = +((no_android / result_length * 100).toFixed(2));
-        var procent_ios = +((no_ios / result_length * 100).toFixed(2));
-        var procent_mobile_others = +((no_others_mobile / result_length * 100).toFixed(2));
-        var procent_chrome = +((no_chrome / result_length * 100).toFixed(2));
-        var procent_firefox = +((no_firefox / result_length * 100).toFixed(2));
-        var procent_opera = +((no_opera / result_length * 100).toFixed(2));
-        var procent_others_browsers = +((no_others_browsers / result_length * 100).toFixed(2));
+        var procent_windows = +((no_windows / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
+        var procent_linux = +((no_linux / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
+        var procent_pc_others = +((no_others_pc / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
+        var procent_android = +((no_android / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
+        var procent_ios = +((no_ios / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
+        var procent_mobile_others = +((no_others_mobile / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
+        var procent_chrome = +((no_chrome / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
+        var procent_firefox = +((no_firefox / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
+        var procent_opera = +((no_opera / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
+        var procent_others_browsers = +((no_others_browsers / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
 
-        // debug 
-        // console.log("procent_windows")
-        // console.log(procent_windows)
-        // console.log("procent_linux")
-        // console.log(procent_linux)
-        // console.log("procent_pc_others")
-        // console.log(procent_pc_others)
-        // console.log("procent_android")
-        // console.log(procent_android)
-        // console.log("procent_ios")
-        // console.log(procent_ios)
-        // console.log("procent_mobile_others")
-        // console.log(procent_mobile_others)
-        // console.log("procent_chrome")
-        // console.log(procent_chrome)
-        // console.log("procent_firefox")
-        // console.log(procent_firefox)
-        // console.log("procent_opera")
-        // console.log(procent_opera)
-        // console.log("procent_others_browsers")
-        // console.log(procent_others_browsers)
-        
+        // Poniżej znajduje się strona zwracana klientowi wraz ze wszystkimi danymi z bazy. 
         return res.write('<html> \
         <head> \
         <title> Signup Form</title> \
@@ -109,17 +77,17 @@ app.post('/sign_up', function(req,res){
         </div> \
         <div class="col-md-6 main"> \
         <form action="/sign_up" method="post"> \
-        <p> Podsumowanie udzielonych odpowiedzi, wyniki w procentach: </p> \
-        <p> System PC Windows: '+String(procent_windows)+'%</p> \
-        <p> System PC Linux: '+String(procent_linux)+'%</p> \
-        <p> Pozostale systemy PC : '+String(procent_pc_others)+'%</p> \
-        <p> System Mobile Android: '+String(procent_android)+'%</p> \
-        <p> System Mobile IOS: '+String(procent_ios)+'%</p> \
-        <p> Pozostale systemy Mobilne : '+String(procent_mobile_others)+'%</p> \
-        <p> Przeglądarka Chrome: '+String(procent_chrome)+'%</p> \
-        <p> Przeglądarka Firefox: '+String(procent_firefox)+'%</p> \
-        <p> Przeglądarka Opera : '+String(procent_opera)+'%</p> \
-        <p> Pozostałe przeglądarki : '+String(procent_others_browsers)+'%</p> \
+        <p> Summary of answers given, results in percent: </p> \
+        <p> Windows PC system: '+String(procent_windows)+'%</p> \
+        <p> PC Linux system: '+String(procent_linux)+'%</p> \
+        <p> Other PC systems : '+String(procent_pc_others)+'%</p> \
+        <p> Mobile Android system: '+String(procent_android)+'%</p> \
+        <p> Mobile IOS system: '+String(procent_ios)+'%</p> \
+        <p> Other Mobile systems : '+String(procent_mobile_others)+'%</p> \
+        <p> Chrome browser: '+String(procent_chrome)+'%</p> \
+        <p> Firefox browser: '+String(procent_firefox)+'%</p> \
+        <p> Opera browser : '+String(procent_opera)+'%</p> \
+        <p> Other browsers : '+String(procent_others_browsers)+'%</p> \
         </form> \
         </div> \
         <div class="col-md-3"> \

@@ -1,9 +1,9 @@
-var express=require("express"); 
-var bodyParser=require("body-parser"); 
+var express=require("express");             // Wymagane biblioteki 
+var bodyParser=require("body-parser");      // Wymagane biblioteki 
   
-const mongoose = require('mongoose'); 
-const crypto = require('crypto');
-mongoose.connect('mongodb+srv://dbUser:dbUserPassword@cluster0-gzzce.mongodb.net/test?retryWrites=true&w=majority'); 
+const mongoose = require('mongoose');       // Wymagane biblioteki 
+const crypto = require('crypto');           // Wymagane biblioteki 
+mongoose.connect('mongodb+srv://dbUser:dbUserPassword@cluster0-gzzce.mongodb.net/test?retryWrites=true&w=majority');        // Połączenie do bazy mongodb. 
 var db=mongoose.connection; 
 db.on('error', console.log.bind(console, "connection error")); 
 db.once('open', function(callback){ 
@@ -20,21 +20,20 @@ app.use(bodyParser.urlencoded({
     extended: true
 })); 
 
-app.post('/sign_up', function(req,res){ 
-    var secrete_id=Date.now().toString(10);
-    var osname = req.body.osname; 
-    var osname_mobile = req.body.osname_mobile; 
-    var browsername = req.body.browsername; 
-    var email =req.body.email; 
-    var haslo =req.body.haslo; 
-    var hashed_secret = crypto.createHash("sha256")
-        .update(osname+osname_mobile+browsername+haslo)
+app.post('/sign_up', function(req,res){                 // Przekierowanie rządania w momencie naciśnięcia przycisku "Submit".
+    var secrete_id=Date.now().toString(10);             // Generowanie ID ankiety na podstawie obecnego czasu, wartość unikatowa. 
+    var osname = req.body.osname;                       // Zmienna przyjmująca odpowiedź na system operacyjny klasy PC.
+    var osname_mobile = req.body.osname_mobile;         // Zmienna przyjmująca odpowiedź na system operacyjny klasy mobile.
+    var browsername = req.body.browsername;             // Zmienna przyjmująca odpowiedź na przeglądarke. 
+    var email =req.body.email;                          // Zmienna przyjmująca podany e-mail. 
+    var haslo =req.body.haslo;                          // Zmienna przyjmująca podane hasło.
+    var hashed_secret = crypto.createHash("sha256")     // Generowanie hash sha256.
+        .update(osname+osname_mobile+browsername+haslo) // Hash generowany jest na podstawie odpowiedzi tzn: system operacyjny klasy PC + system operacyjny klasy mobile + przeglądarka + hasło.
         .digest("hex");
-    var query = {"email": String(email)};
-    db.collection('unique_emails').findOne(query, function(err, result) {
+    var query = {"email": String(email)};               // Przygotowanie query - wymagane do przeszukania bazy - query zawiera e-mail, potrzebne do weryfikacji powtórzonych e-maili.
+    db.collection('unique_emails').findOne(query, function(err, result) {       // W tym momencie rozpoczyna się weryfikacja czy użytkownik wypełniał już ankietę. Weryfikacja na poziomie podanego e-mail (przeszukanie bazy). 
         if (err) throw err;
-        if (result) { 
-            // return res.write('<html><body><p> Odpowiedz zostala juz udzielona </p></body></html>');
+        if (result) {                                   // Jeżeli mail znajduję się już na bazie, zwróć poniższe.
             return res.write('<html> \
                 <head> \
                 <title> Signup Form</title> \
@@ -51,7 +50,7 @@ app.post('/sign_up', function(req,res){
                 </div> \
                 <div class="col-md-6 main"> \
                 <form action="/sign_up" method="post"> \
-                <h1>  Odpowiedź została już udzielona. </h1> \
+                <h1>  You have already participated in the survey. </h1> \
                 </form> \
                 </div> \
                 <div class="col-md-3"> \
@@ -60,16 +59,16 @@ app.post('/sign_up', function(req,res){
                 </div> \
                 </body> \
                 </html>');
-        } else 
+        } else                                      // Jeżeli mail nie znajduje się na bazie przygotuj zestaw danych z ankiety do przekazania na baze. 
         {    
-            var data = { 
+            var data = {                            // Na osobną baze "data" przekazywane są dane z ankiety (udzielone odpowiedzi oraz ID ankiety wraz z hashem).
                 "osname": osname, 
                 "osname_mobile": osname_mobile,
                 "browsername": browsername,
                 "secrete_id": secrete_id,
                 "hashed_secret": hashed_secret
             } 
-            var unique_emails = { 
+            var unique_emails = {                   // Na osobną baze "unique_emails" przekazywane są e-mail.
                 "email": email 
             } 
         db.collection('details').insertOne(data,function(err, collection){ 
@@ -82,10 +81,9 @@ app.post('/sign_up', function(req,res){
                 console.log("unique_emails inserted Successfully"); 
                       
             }); 
-            
-            let fill_content_id="Twoje ID odpowiedzi: "+String(secrete_id)
-            let fill_content_hash=" Twój SHA256 hash wynosi: "+String(hashed_secret)
-            // return res.write('<html><body><p>'+fill_content+'</p></body></html>');
+            // Poniższej przygotowana jest strona dla klienta, który pomyślnie wziął udział w ankiecie, a jego odpowiedzi zostały przesłane na baze. 
+            let fill_content_id="ID of your survey: "+String(secrete_id)
+            let fill_content_hash="Your SHA256 hash is: "+String(hashed_secret)
             return res.write('<html> \
             <head> \
             <title> Signup Form</title> \

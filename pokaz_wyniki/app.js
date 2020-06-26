@@ -1,9 +1,9 @@
-var express=require("express"); 
-var bodyParser=require("body-parser"); 
-const crypto = require('crypto');
+var express=require("express");             // Wymagane biblioteki 
+var bodyParser=require("body-parser");      // Wymagane biblioteki 
+const crypto = require('crypto');           // Wymagane biblioteki
   
-const mongoose = require('mongoose'); 
-mongoose.connect('mongodb+srv://dbUser:dbUserPassword@cluster0-gzzce.mongodb.net/test?retryWrites=true&w=majority'); 
+const mongoose = require('mongoose');       // Wymagane biblioteki
+mongoose.connect('mongodb+srv://dbUser:dbUserPassword@cluster0-gzzce.mongodb.net/test?retryWrites=true&w=majority');  // Połączenie do bazy mongodb. 
 var db=mongoose.connection; 
 db.on('error', console.log.bind(console, "connection error")); 
 db.once('open', function(callback){ 
@@ -19,24 +19,22 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ 
     extended: true
 })); 
-app.post('/sign_up', function(req,res){ 
-    var secrete_id = req.body.secrete_id; 
-    var user_password = req.body.user_password; 
+app.post('/sign_up', function(req,res){             // Przekierowanie rządania w momencie naciśnięcia przycisku "Submit" 
+    var secrete_id = req.body.secrete_id;           // Zmienna przyjmowanie wartość podanego ID ankiety. 
+    var user_password = req.body.user_password;     // Zmienna przyjmowanie wartość podanego hasła. 
 
-var query = {"secrete_id": String(secrete_id)};
-db.collection('details').find(query).toArray(function(err,result) {
+var query = {"secrete_id": String(secrete_id)};     // Przygotowanie query - wymagane do przeszukania - query zawiera ID ankiety.
+db.collection('details').find(query).toArray(function(err,result) {         // Przeszukanie bazy "details" w celu uzyskania udzielonych odpowiedzi. Wyszukiwanie odbywa się na podstawie podanego ID ankiety. 
     if (err) throw err;
-    var result_os=result[0]["osname"]               // wybrana odpowiedz z bazy 
-    var osname_mobile=result[0]["osname_mobile"]               // wybrana odpowiedz z bazy 
-    var browsername=result[0]["browsername"]               // wybrana odpowiedz z bazy 
-    var result_hash=result[0]["hashed_secret"]      // hash z bazy 
-     // hash z odpowiedzi z bazy oraz podanego przez uzytkownika hasla 
+    var result_os=result[0]["osname"]                           // Zmienna przyjmująca odpowiedź na system operacyjny klasy PC
+    var osname_mobile=result[0]["osname_mobile"]                // Zmienna przyjmująca odpowiedź na system operacyjny klasy mobile
+    var browsername=result[0]["browsername"]                    // Zmienna przyjmująca odpowiedź na przeglądarke. 
+    var result_hash=result[0]["hashed_secret"]                  // Zmienna przyjmująca hash z bazy. 
+    // W tym miejscu następuje generowanie hasha na podstawie odpowiedzi z bazy oraz podanego przez uzytkownika hasla 
     var check_hash = crypto.createHash("sha256")    
         .update(result_os+osname_mobile+browsername+user_password)
         .digest("hex");
-    // let s=if(costam) - jezeli hash jest rowny z tym na bazie to zwroc stringa ze jest ok a jak nie to ze nie jest ok .
-    if(check_hash==result_hash){
-        // return res.write('<html><body><p> Udzielona odpowiedź to: '+String(result_os)+' oraz hash jest zgodny </p></body></html>')
+    if(check_hash==result_hash){                                // Sprawdź czy hash odpowiada hashowi na bazie. Jeżeli tak, zwróć użytkownikowi listę z udzielonymi odpowiedziami.
         return res.write('<html> \
             <head> \
             <title> Signup Form</title> \
@@ -53,11 +51,11 @@ db.collection('details').find(query).toArray(function(err,result) {
             </div> \
             <div class="col-md-6 main"> \
             <form action="/sign_up" method="post"> \
-            <p> Twoje udzielone odpowiedzi to: </p> \
-            <p> Wybrany system klasy PC: '+String(result_os)+'</p> \
-            <p> Wybrany system klasy Mobilnej: '+String(osname_mobile)+'</p> \
-            <p> Wybrana przeglądarka: '+String(browsername)+'</p> \
-            <p> Twoj Hash jest zgodny</p> \
+            <p> Your survey: </p> \
+            <p> Selected PC class operating system: '+String(result_os)+'</p> \
+            <p> Selected mobile class operating system: '+String(osname_mobile)+'</p> \
+            <p> Selected web browser: '+String(browsername)+'</p> \
+            <p> Your hash number is correct</p> \
             </form> \
             </div> \
             <div class="col-md-3"> \
@@ -67,7 +65,7 @@ db.collection('details').find(query).toArray(function(err,result) {
             </body> \
             </html>');
     }
-    else{
+    else{       // Jeżeli hash nie jest równy z hashem na bazie poinformuj użytkownika.
         return res.write('<html> \
             <head> \
             <title> Signup Form</title> \
@@ -84,7 +82,7 @@ db.collection('details').find(query).toArray(function(err,result) {
             </div> \
             <div class="col-md-6 main"> \
             <form action="/sign_up" method="post"> \
-            <p> Twoj Hash nie jest zgodny</p> \
+            <p> Your hash number is not correct, please verify your password or contact site administration</p> \
             </form> \
             </div> \
             <div class="col-md-3"> \
@@ -94,8 +92,6 @@ db.collection('details').find(query).toArray(function(err,result) {
             </body> \
             </html>');
     }
-
-    // return res.write('<html><body><p> Your answear was: '+String(result_os)+' and your SHA256 hash was: '+String(result_hash)+'</p></body></html>');
 
 
 
