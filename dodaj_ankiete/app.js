@@ -23,10 +23,12 @@ app.use(bodyParser.urlencoded({
 app.post('/sign_up', function(req,res){ 
     var secrete_id=Date.now().toString(10);
     var osname = req.body.osname; 
+    var osname_mobile = req.body.osname_mobile; 
+    var browsername = req.body.browsername; 
     var email =req.body.email; 
     var haslo =req.body.haslo; 
     var hashed_secret = crypto.createHash("sha256")
-        .update(osname+haslo)
+        .update(osname+osname_mobile+browsername+haslo)
         .digest("hex");
     var query = {"email": String(email)};
     db.collection('unique_emails').findOne(query, function(err, result) {
@@ -62,6 +64,8 @@ app.post('/sign_up', function(req,res){
         {    
             var data = { 
                 "osname": osname, 
+                "osname_mobile": osname_mobile,
+                "browsername": browsername,
                 "secrete_id": secrete_id,
                 "hashed_secret": hashed_secret
             } 

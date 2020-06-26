@@ -27,10 +27,12 @@ var query = {"secrete_id": String(secrete_id)};
 db.collection('details').find(query).toArray(function(err,result) {
     if (err) throw err;
     var result_os=result[0]["osname"]               // wybrana odpowiedz z bazy 
+    var osname_mobile=result[0]["osname_mobile"]               // wybrana odpowiedz z bazy 
+    var browsername=result[0]["browsername"]               // wybrana odpowiedz z bazy 
     var result_hash=result[0]["hashed_secret"]      // hash z bazy 
      // hash z odpowiedzi z bazy oraz podanego przez uzytkownika hasla 
     var check_hash = crypto.createHash("sha256")    
-        .update(result_os+user_password)
+        .update(result_os+osname_mobile+browsername+user_password)
         .digest("hex");
     // let s=if(costam) - jezeli hash jest rowny z tym na bazie to zwroc stringa ze jest ok a jak nie to ze nie jest ok .
     if(check_hash==result_hash){
@@ -51,7 +53,10 @@ db.collection('details').find(query).toArray(function(err,result) {
             </div> \
             <div class="col-md-6 main"> \
             <form action="/sign_up" method="post"> \
-            <p> Udzielona odpowiedź to: '+String(result_os)+'</p> \
+            <p> Twoje udzielone odpowiedzi to: </p> \
+            <p> Wybrany system klasy PC: '+String(result_os)+'</p> \
+            <p> Wybrany system klasy Mobilnej: '+String(osname_mobile)+'</p> \
+            <p> Wybrana przeglądarka: '+String(browsername)+'</p> \
             <p> Twoj Hash jest zgodny</p> \
             </form> \
             </div> \
