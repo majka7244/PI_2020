@@ -32,7 +32,32 @@ app.post('/sign_up', function(req,res){
     db.collection('unique_emails').findOne(query, function(err, result) {
         if (err) throw err;
         if (result) { 
-            return res.write('<html><body><p> Odpowiedz zostala juz udzielona </p></body></html>');
+            // return res.write('<html><body><p> Odpowiedz zostala juz udzielona </p></body></html>');
+            return res.write('<html> \
+                <head> \
+                <title> Signup Form</title> \
+                <link rel="stylesheet" href= "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> \
+                <link rel="stylesheet" type="text/css" href="style.css"> \
+                </head> \
+                <body> \
+                <br> \
+                <br> \
+                <br> \
+                <div class="container" > \
+                <div class="row"> \
+                <div class="col-md-3"> \
+                </div> \
+                <div class="col-md-6 main"> \
+                <form action="/sign_up" method="post"> \
+                <h1>  Odpowiedź została już udzielona. </h1> \
+                </form> \
+                </div> \
+                <div class="col-md-3"> \
+                </div> \
+                </div> \
+                </div> \
+                </body> \
+                </html>');
         } else 
         {    
             var data = { 
@@ -54,8 +79,35 @@ app.post('/sign_up', function(req,res){
                       
             }); 
             
-            let fill_content="your secrete id is "+String(secrete_id)+" and your SHA256 hash is "+String(hashed_secret)
-            return   res.write('<html><body><p>'+fill_content+'</p></body></html>');
+            let fill_content_id="Twoje ID odpowiedzi: "+String(secrete_id)
+            let fill_content_hash=" Twój SHA256 hash wynosi: "+String(hashed_secret)
+            // return res.write('<html><body><p>'+fill_content+'</p></body></html>');
+            return res.write('<html> \
+            <head> \
+            <title> Signup Form</title> \
+            <link rel="stylesheet" href= "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"> \
+            <link rel="stylesheet" type="text/css" href="style.css"> \
+            </head> \
+            <body> \
+            <br> \
+            <br> \
+            <br> \
+            <div class="container" > \
+            <div class="row"> \
+            <div class="col-md-3"> \
+            </div> \
+            <div class="col-md-6 main"> \
+            <form action="/sign_up" method="post"> \
+            <p>  '+fill_content_id+' </p> \
+            <p>  '+fill_content_hash+' </p> \
+            </form> \
+            </div> \
+            <div class="col-md-3"> \
+            </div> \
+            </div> \
+            </div> \
+            </body> \
+            </html>');
         }
     })
 })
