@@ -1,3 +1,5 @@
+# Dokumentacja kodu źródłowego znajduje się w pliku dokumentacja.md
+
 # Informacje o Aplikacji 
 Aplikacja działa w oparciu o nodejs oraz mongodb.
 
