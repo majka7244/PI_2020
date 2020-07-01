@@ -8,7 +8,7 @@ var bodyParser=require("body-parser");
 const mongoose = require('mongoose');       
 const crypto = require('crypto');            
 ```
-### Połączenie do bazy mongodb. 
+### Połączenie aplikacji do bazy danych mongodb. 
 ```javascript
 mongoose.connect('mongodb+srv://dbUser:dbUserPassword@cluster0-gzzce.mongodb.net/test?retryWrites=true&w=majority');         
 var db=mongoose.connection; 
@@ -17,7 +17,7 @@ db.once('open', function(callback){
     console.log("connection succeeded"); 
 }) 
 ```
-### Inicjalizacja biblioteki express, API z którego korzysta aplikacja. 
+### Inicjalizacja biblioteki express. Jest to API z którego korzysta aplikacja. 
 ```javascript
 var app=express() 
 app.use(express.static(__dirname));
@@ -45,15 +45,15 @@ var hashed_secret = crypto.createHash("sha256")
     .update(osname+osname_mobile+browsername+haslo) 
     .digest("hex");
 ```
-### Przygotowanie query - wymagane do przeszukania bazy - query zawiera e-mail, potrzebne do weryfikacji powtórzonych e-maili.
+### Przygotowanie query, które jest wymagane do przeszukania bazy. Query zawiera e-mail, potrzebny do weryfikacji powtórzonych adresów e-mail.
 ```javascript
     var query = {"email": String(email)};               
 ```
-### weryfikacja czy użytkownik wypełniał już ankietę. Weryfikacja na poziomie podanego e-mail (przeszukanie bazy).
+### Weryfikacja czy użytkownik wypełnił już ankietę. Weryfikacja na podstawie podanego e-mail (przeszukiwanie w bazie danych).
 ```javascript
     db.collection('unique_emails').findOne(query, function(err, result)      
 ```
-###  Jeżeli mail znajduję się już na bazie, zwracamy odpowiednią treść. 
+###  Jeżeli adres e-mail znajduję się już w bazie danych to zwracamy odpowiednią treść. 
 ```javascript
 if (result) {                                  
     return res.write('<html> \
@@ -83,7 +83,7 @@ if (result) {
         </html>');
 }
 ```
-### Przekierowanie danych na baze, gdy użytkownik wypełnia ankiete po raz pierwszy. 
+### Wysłanie danych do bazy danych, gdy użytkownik po raz pierwszy wypełnił ankietę. 
 ```javascript
 else                                      // Jeżeli mail nie znajduje się na bazie przygotuj zestaw danych z ankiety do przekazania na baze. 
 {    
@@ -98,7 +98,7 @@ else                                      // Jeżeli mail nie znajduje się na b
         "email": email 
     } 
 ```
-### Zwracana strona dla klienta, który pomyślnie wziął udział w ankiecie, a jego odpowiedzi zostały przesłane na baze.
+### Przygotowana strona dla klienta, który pomyślnie wypełnił ankietę i jego odpowiedzi zostały wysłane do bazy danych.
 ```javascript 
 let fill_content_id="ID of your survey: "+String(secrete_id)
 let fill_content_hash="Your SHA256 hash is: "+String(hashed_secret)
@@ -129,7 +129,7 @@ return res.write('<html> \
 </body> \
 </html>');
 ```
-### Uruchomienie aplikacji na podanym porcie. 
+### Uruchomienie aplikacji na danym porcie. 
 ```javascript
 app.get('/',function(req,res){ 
 res.set({ 
@@ -151,7 +151,7 @@ var bodyParser=require("body-parser");
 const mongoose = require('mongoose');       
 const crypto = require('crypto');            
 ```
-### Połączenie do bazy mongodb. 
+### Połączenie aplikacji do bazy danych mongodb. 
 ```javascript
 mongoose.connect('mongodb+srv://dbUser:dbUserPassword@cluster0-gzzce.mongodb.net/test?retryWrites=true&w=majority');         
 var db=mongoose.connection; 
@@ -160,7 +160,7 @@ db.once('open', function(callback){
     console.log("connection succeeded"); 
 }) 
 ```
-### Inicjalizacja biblioteki express, API z którego korzysta aplikacja. 
+### Inicjalizacja biblioteki express. Jest to API z którego korzysta aplikacja. 
 ```javascript
 var app=express() 
 app.use(express.static(__dirname));
@@ -172,28 +172,28 @@ app.use(bodyParser.urlencoded({
     extended: true
 })); 
 ```
-### Przygotowanie query - wymagane do przeszukania - query zawiera ID ankiety.
+### Przygotowanie query, które jest wymagane do przeszukania bazy. Query zawiera ID ankiety.
 ```javascript
 var query = {"secrete_id": String(secrete_id)};  
 ```
-### Przeszukanie bazy "details" w celu uzyskania udzielonych odpowiedzi. Wyszukiwanie odbywa się na podstawie podanego ID ankiety. 
+### Przeszukanie bazy danych "details" w celu uzyskania udzielonych już odpowiedzi. Wyszukiwanie odbywa się na podstawie podanego ID ankiety. 
 ```javascript
 db.collection('details').find(query).toArray(function(err,result)       
 ```
-### Inicjalizacja zmiennych 
+### Inicjalizacja zmiennych.
 ```javascript
 var result_os=result[0]["osname"]                           // Zmienna przyjmująca odpowiedź na system operacyjny klasy PC
 var osname_mobile=result[0]["osname_mobile"]                // Zmienna przyjmująca odpowiedź na system operacyjny klasy mobile
 var browsername=result[0]["browsername"]                    // Zmienna przyjmująca odpowiedź na przeglądarke. 
 var result_hash=result[0]["hashed_secret"]                  // Zmienna przyjmująca hash z bazy. 
 ```
-### Generowanie hasha na podstawie odpowiedzi z bazy oraz podanego przez uzytkownika hasla 
+### Generowanie hash na podstawie odpowiedzi, które użytkownik udzielił, oraz podanego przez użytkownika hasła pobieranych z bazy danych.
 ```javascript
 var check_hash = crypto.createHash("sha256")    
         .update(result_os+osname_mobile+browsername+user_password)
         .digest("hex");
 ```
-### Odpowiedź zwrotna w przypadku kiedy hash jest pasujący, następuje zwrócenie użytkownikowi listy z odpowiedziami 
+### W przypadku kiedy hash się zgadza, użytkownikowi zostają zwrócone listy z jego odpowiedziami.
 ```javascript
 return res.write('<html> \
     <head> \
@@ -225,7 +225,7 @@ return res.write('<html> \
     </body> \
     </html>');
 ```
-### Jeżeli hash nie jest równy z hashem na bazie informujemy użytkownika poniższą zwrotką. 
+### Jeżeli hash, podany przy weryfikacji odpowiedzi, nie jest zgodny z hashem z bazy danych, użytkownik zostaję poinformowany poniższym komunikatem.
 ```javascript
 return res.write('<html> \
     <head> \
@@ -253,7 +253,7 @@ return res.write('<html> \
     </body> \
     </html>');
 ```
-### Uruchomienie aplikacji na podanym porcie.
+### Uruchomienie aplikacji na danym porcie.
 ```javascript
 app.get('/',function(req,res){ 
 res.set({ 
@@ -276,11 +276,11 @@ var bodyParser=require("body-parser");
 const mongoose = require('mongoose');       
 const crypto = require('crypto');            
 ```
-### Przeszukanie bazy "details" w celu uzyskania wszystkich udzielonych odpowiedzi. 
+### Przeszukanie bazy danych "details" w celu uzyskania wszystkich udzielonych odpowiedzi. 
 ```javascript
 db.collection("details").find({}).toArray(function(err, result)
 ```
-### Inicjalizacja zmiennych
+### Inicjalizacja zmiennych.
 ```javascript
 var result_length = result.length;            // Zmienna przyjmująca wartość ilości udzielonych ankiet. 
 var no_windows=0                              // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na system operacyjny klasy PC "windows" .
@@ -294,7 +294,7 @@ var no_firefox=0                              // Zmienna przyjmująca wartość 
 var no_opera=0                                // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na wybraną przeglądarkę "opera".
 var no_others_browsers=0                      // Zmienna przyjmująca wartość ilości udzielonych odpowiedzi na wybraną przeglądarkę chrome/firefox/opera.
 ```
-### Podliczenie wyników systemu operacyjnego klasy PC z bazy.
+### Podliczenie wyników systemu operacyjnego klasy PC z bazy danych.
 ```javascript
 for (i = 0; i < result.length; i++) {         
     if(result[i]["osname"].toLowerCase().includes("windows")){no_windows++}
@@ -302,7 +302,7 @@ for (i = 0; i < result.length; i++) {
     else{no_others_pc++}
     }
 ```
-### Podliczenie wyników systemu operacyjnego klasy Mobile z bazy.
+### Podliczenie wyników systemu operacyjnego klasy Mobile z bazy danych.
 ```javascript
 for (i = 0; i < result.length; i++) {         
     if(result[i]["osname_mobile"].toLowerCase().includes("android")){no_android++}
@@ -310,7 +310,7 @@ for (i = 0; i < result.length; i++) {
     else{no_others_mobile++}
     }
 ```
-### Podliczenie wyników wybranej przeglądarki z bazy.
+### Podliczenie wyników wybranej przeglądarki z bazy danych.
 ```javascript
 for (i = 0; i < result.length; i++) {       
     if(result[i]["browsername"].toLowerCase().includes("chrome")){no_chrome++}
@@ -319,7 +319,7 @@ for (i = 0; i < result.length; i++) {
     else{no_others_browsers++}
     }
 ```
-### Inicjalizacja zmiennych 
+### Inicjalizacja zmiennych.
 ```javascript
 var procent_windows = +((no_windows / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
 var procent_linux = +((no_linux / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
@@ -332,7 +332,7 @@ var procent_firefox = +((no_firefox / result_length * 100).toFixed(2));         
 var procent_opera = +((no_opera / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
 var procent_others_browsers = +((no_others_browsers / result_length * 100).toFixed(2));                 // Tworzenie zmiennych w procentach z udzielonych odpowiedzi w stosunku do wszystkich odpowiedzi.
 ```
-### Strona zwracana klientowi wraz ze wszystkimi danymi z bazy. 
+### Strona, na której użytkownikowi zostają zwrócone wszystkie oddane głosy jakie brały udział w ankiecie. 
 ```javascript
 return res.write('<html> \
 <head> \
@@ -370,7 +370,7 @@ return res.write('<html> \
 </body> \
 </html>');
 ```
-### Uruchomienie aplikacji na podanym porcie.
+### Uruchomienie aplikacji na danym porcie.
 ```javascript
 app.get('/',function(req,res){ 
 res.set({ 
