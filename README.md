@@ -1,5 +1,5 @@
 # Dokumentacja kodu źródłowego znajduje się w pliku dokumentacja.md
-
+https://github.com/majka7244/PI_2020/blob/master/dokumentacja.md
 # Informacje o Aplikacji 
 Aplikacja działa w oparciu o nodejs oraz mongodb.
 
